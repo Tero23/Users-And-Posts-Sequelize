@@ -7,8 +7,7 @@ const router = express.Router();
 
 router.route('/login').post(userController.login);
 
-// router.use(auth.auth);
-// auth.restrictTo('user', 'admin', 'superAdmin'),
+router.use(auth.auth);
 
 router.route('/').post(userController.createUser).get(userController.getUsers);
 router
@@ -21,6 +20,8 @@ router
   .route('/:id')
   .get(auth.restrictTo('admin', 'superAdmin'), userController.getUser)
   .patch(auth.restrictTo('admin', 'superAdmin'), userController.updateUser)
-  .delete(userController.deleteUser);
+  .delete(auth.restrictTo('admin', 'superAdmin'), userController.deleteUser);
+
+router.get('/me/logout', userController.logout);
 
 module.exports = router;

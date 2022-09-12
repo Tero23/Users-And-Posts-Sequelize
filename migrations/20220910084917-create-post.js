@@ -16,10 +16,13 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      owner: {
+      userId: {
         type: Sequelize.INTEGER,
-        unique: true,
         allowNull: false,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
       },
       status: {
         type: Sequelize.STRING,

@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  const user = sequelize.define('user', {
+  const post = sequelize.define('post', {
     id: {
       allowNull: false,
       autoIncrement: true,
@@ -14,10 +14,13 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    owner: {
+    userId: {
       type: DataTypes.INTEGER,
-      unique: true,
       allowNull: false,
+      references: {
+        model: 'users',
+        key: 'id',
+      },
     },
     status: {
       type: DataTypes.STRING,
@@ -32,5 +35,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
     },
   });
-  return user;
+
+  post.associate = (models) => {
+    post.belongsTo(models.user);
+  };
+
+  return post;
 };

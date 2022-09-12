@@ -49,5 +49,10 @@ module.exports = (sequelize, DataTypes) => {
       paranoid: true,
     }
   );
+
+  user.associate = (models) => {
+    user.hasOne(models.post);
+  };
+
   return user;
 };

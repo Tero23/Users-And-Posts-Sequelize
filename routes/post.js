@@ -1,8 +1,9 @@
 require('dotenv').config();
 
 const postController = require('../controllers/post');
-const auth = require('../middlewares/auth');
 
+const auth = require('../middlewares/auth');
+const multer = require('multer');
 const express = require('express');
 const router = express.Router();
 
@@ -17,14 +18,16 @@ router
   .post(
     auth.auth,
     auth.restrictTo('user', 'admin', 'superAdmin'),
+    multer(postController.multerConfig).single('image'),
     postController.createPost
   );
+
+router.use(auth.auth);
 
 //Accessable by admins and the superAdmin
 router
   .route('/pending')
   .get(
-    auth.auth,
     auth.restrictTo('admin', 'superAdmin'),
     postController.getAllPendingPosts
   );
@@ -32,13 +35,8 @@ router
 //Accessable by admins and the superAdmin
 router
   .route('/pending/:id')
-  .get(
-    auth.auth,
-    auth.restrictTo('admin', 'superAdmin'),
-    postController.getPendingPostById
-  )
+  .get(auth.restrictTo('admin', 'superAdmin'), postController.approvePost)
   .delete(
-    auth.auth,
     auth.restrictTo('admin', 'superAdmin'),
     postController.rejectPostById
   );
@@ -46,12 +44,10 @@ router
 router
   .route('/:id')
   .delete(
-    auth.auth,
     auth.restrictTo('user', 'admin', 'superAdmin'),
     postController.deletePostById
   )
   .get(
-    auth.auth,
     auth.restrictTo('user', 'admin', 'superAdmin'),
     postController.getPostById
   );
