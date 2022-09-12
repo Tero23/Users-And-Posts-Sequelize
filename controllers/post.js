@@ -108,6 +108,37 @@ exports.createPost = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.deletePostById = catchAsync(async (req, res, next) => {});
+exports.deletePostById = catchAsync(async (req, res, next) => {
+  const post = await Post.findOne({
+    where: { id: req.params.id },
+    include: [
+      {
+        model: User,
+        attributes: ['username', 'email'],
+      },
+    ],
+  });
+  if (!post) return next(new AppError('There is no post with that ID!', 404));
+  if (req.user.role === 'user' && req.user.id !== post.userId) {
+    return next(new AppError("You cannot delete other's posts!", 403));
+  }
+  await post.destroy();
+  res.status(200).json({
+    message: 'Post deleted!',
+    post: post.text,
+  });
+});
 
-exports.getPostById = catchAsync(async (req, res, next) => {});
+exports.getPostById = catchAsync(async (req, res, next) => {
+  const post = await Post.findOne({
+    where: { id: req.params.id },
+    include: [
+      {
+        model: User,
+        attributes: ['username', 'email'],
+      },
+    ],
+  });
+  if (!post) return next(new AppError('There is no post with that ID!', 404));
+  res.status(200).json({ post });
+});

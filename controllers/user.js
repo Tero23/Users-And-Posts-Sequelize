@@ -24,8 +24,20 @@ exports.createUser = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteUser = catchAsync(async (req, res, next) => {
-  const { id } = req.params;
-  await User.destroy({ where: { id } });
+  const user = await User.findOne({ where: { id: req.params.id } });
+  if (user.role === 'superAdmin') {
+    await User.destroy({ where: { id: req.user.id } });
+    return res.status(200).clearCookie('token').clearCookie('user_id').json({
+      status: 'success',
+      message: 'You tried to delete your boss... Now you are FIRED!!!',
+    });
+  }
+  // return next(
+  //   new AppError('You cannot delete the owner of the company!!! Watch your back from now on!', 403)
+  // );
+  if (req.user.role === 'admin' && user.role !== 'user')
+    return next(new AppError('You Cannot Delete Admins!', 403));
+  await User.destroy({ where: { id: req.params.id } });
   res.status(200).json({
     status: 'success',
     message: 'User successfully deleted!',
@@ -33,9 +45,19 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
 });
 
 exports.getUsers = catchAsync(async (req, res, next) => {
-  const users = await User.findAll({
-    attributes: { exclude: ['password', 'deletedAt'] },
-  });
+  let users;
+  if (req.user.role === 'admin') {
+    users = await User.findAll({
+      where: { role: 'user' },
+      attributes: { exclude: ['password', 'deletedAt'] },
+    });
+  } else {
+    users = await User.findAll({
+      where: { role: { [Op.ne]: 'superAdmin' } },
+      attributes: { exclude: ['password', 'deletedAt'] },
+      order: [['role', 'DESC']],
+    });
+  }
   res.status(200).json({
     message: 'success',
     data: {

@@ -1,11 +1,6 @@
 require('dotenv').config();
 const AppError = require('../utils/appError');
 
-const handleCastErrorDB = (err) => {
-  const message = `Invalid ${err.path}: ${err.value}`;
-  return new AppError(message, 400);
-};
-
 const handleDuplicateFieldsDB = (err) => {
   const message = `${err.errors[0].message}. Please use another value!`;
   return new AppError(message, 400);
@@ -53,7 +48,6 @@ module.exports = (err, req, res, next) => {
   } else if (process.env.NODE_ENV === 'production') {
     let error = { ...err, message: err.message };
     console.log(error);
-    if (error.kind === 'ObjectId') error = handleCastErrorDB(error);
     if (error.name === 'SequelizeUniqueConstraintError')
       error = handleDuplicateFieldsDB(error);
     if (error.name === 'SequelizeValidationError')

@@ -9,7 +9,10 @@ router.route('/login').post(userController.login);
 
 router.use(auth.auth);
 
-router.route('/').post(userController.createUser).get(userController.getUsers);
+router
+  .route('/')
+  .post(auth.restrictTo('admin', 'superAdmin'), userController.createUser)
+  .get(auth.restrictTo('admin', 'superAdmin'), userController.getUsers);
 router
   .route('/me')
   .get(
