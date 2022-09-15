@@ -1,5 +1,10 @@
 module.exports = (sequelize, DataTypes) => {
   const like = sequelize.define('like', {
+    id: {
+      allowNull: false,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+    },
     userId: {
       type: DataTypes.UUID,
       primaryKey: true,

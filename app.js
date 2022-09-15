@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { userRouter, postRouter } = require('./routes/index');
+const { userRouter, postRouter, likeRouter } = require('./routes/index');
 const globalErrorHandler = require('./controllers/error');
 const AppError = require('./utils/appError');
 const cookieParser = require('cookie-parser');
@@ -17,6 +17,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/posts', postRouter);
+app.use('/api/v1/posts', likeRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));

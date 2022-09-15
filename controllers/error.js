@@ -12,6 +12,18 @@ const handleValidationErrorDB = (err) => {
   return new AppError(message, 403);
 };
 
+// valid UUID but does not exist in the dataBase
+const handleForeignKeyErrorDB = (err) => {
+  const message = 'The post with that id does not exist!';
+  return new AppError(message, 400);
+};
+
+// datatype is UUID and has a certain length.. when an invalid uuid with longer length is set
+const handleSequelizeErrorDB = (err) => {
+  const message = 'Invalid UUID!';
+  return new AppError(message, 400);
+};
+
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
     status: err.status,
@@ -52,6 +64,10 @@ module.exports = (err, req, res, next) => {
       error = handleDuplicateFieldsDB(error);
     if (error.name === 'SequelizeValidationError')
       error = handleValidationErrorDB(error);
+    if (error.name === 'SequelizeForeignKeyConstraintError')
+      error = handleForeignKeyErrorDB(error);
+    if (error.name === 'SequelizeDatabaseError')
+      error = handleSequelizeErrorDB(error);
     sendErrorProd(error, res);
   }
 };

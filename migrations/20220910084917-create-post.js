@@ -30,14 +30,19 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      rating: {
+      likes: {
         type: Sequelize.INTEGER,
         allowNull: false,
+        defaultValue: 0,
+      },
+      rating: {
+        type: Sequelize.DECIMAL,
+        allowNull: false,
         defaultValue: 1,
-        references: {
-          model: 'comments',
-          key: 'id',
-        },
+        // references: {
+        //   model: 'comments',
+        //   key: 'id',
+        // },
       },
       createdAt: {
         allowNull: false,

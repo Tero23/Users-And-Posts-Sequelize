@@ -2,6 +2,11 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('Likes', {
+      id: {
+        allowNull: false,
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
+      },
       userId: {
         type: Sequelize.UUID,
         primaryKey: true,
