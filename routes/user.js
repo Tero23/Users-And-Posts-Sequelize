@@ -25,6 +25,8 @@ router
   .patch(auth.restrictTo('admin', 'superAdmin'), userController.updateUser)
   .delete(auth.restrictTo('admin', 'superAdmin'), userController.deleteUser);
 
+router.route('/:id/stats').get(userController.getUserStats);
+
 router.get('/me/logout', userController.logout);
 
 module.exports = router;

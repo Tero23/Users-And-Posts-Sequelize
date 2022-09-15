@@ -44,8 +44,6 @@ exports.getAllPendingPosts = catchAsync(async (req, res, next) => {
   res.status(200).json({ count: posts.length, posts });
 });
 
-exports.getPendingPostById = catchAsync(async (req, res, next) => {});
-
 exports.rejectPostById = catchAsync(async (req, res, next) => {
   const post = await Post.findOne({
     where: { id: req.params.id, status: 'Pending' },

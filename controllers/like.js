@@ -30,3 +30,24 @@ exports.disLikePost = catchAsync(async (req, res, next) => {
     message: 'You Unliked this post.',
   });
 });
+
+exports.getAllLikesOfAPost = catchAsync(async (req, res, next) => {
+  const likes = await Like.findAll({
+    where: { postId: req.params.postId },
+    attributes: { exclude: ['id', 'userId', 'postId', 'updatedAt'] },
+    include: [
+      {
+        model: User,
+        attributes: ['username'],
+      },
+    ],
+    order: [['createdAt', 'DESC']],
+  });
+  const post = await Post.findOne({ where: { id: req.params.postId } });
+  res.status(200).json({
+    status: 'success',
+    message: `Here are all the likes of the post: ${post.text}`,
+    count: likes.length,
+    likes: likes,
+  });
+});

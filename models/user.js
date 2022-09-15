@@ -71,12 +71,5 @@ module.exports = (sequelize, DataTypes) => {
       hooks: true,
     });
   };
-  user.associate = (models) => {
-    user.hasMany(models.like, {
-      onDelete: 'CASCADE',
-      hooks: true,
-    });
-  };
-
   return user;
 };

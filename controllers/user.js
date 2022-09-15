@@ -1,6 +1,6 @@
 require('dotenv').config();
 const { Op, Sequelize } = require('sequelize');
-const { user: User } = require('../models/index');
+const { user: User, post: Post } = require('../models/index');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const bcrypt = require('bcrypt');
@@ -170,4 +170,38 @@ exports.logout = catchAsync(async (req, res, next) => {
       status: 'success',
       message: `${req.user.username} logged out successfully`,
     });
+});
+
+exports.getUserStats = catchAsync(async (req, res, next) => {
+  const user = await User.findOne({ where: { id: req.params.id } });
+  const totalNumberOfLikes = 5;
+  const numberOfPosts = await Post.count({ where: { userId: req.params.id } });
+  const averageLikesPerPost = await Post.findAll({
+    attributes: [
+      'userId',
+      [Sequelize.fn('avg', Sequelize.col('likes')), 'averageLikes'],
+    ],
+    where: { userId: req.params.id },
+    raw: true,
+  });
+  const averagePostRating = await Post.findAll({
+    attributes: [
+      'userId',
+      [Sequelize.fn('avg', Sequelize.col('rating')), 'averageRating'],
+    ],
+    where: { userId: req.params.id },
+    raw: true,
+  });
+  res.status(200).json({
+    status: 'success',
+    message: `Here are the stats of: ${user.username}`,
+    stats: {
+      numberOfPosts,
+      totalNumberOfLikes,
+      averageLikesPerPost:
+        Math.round(+averageLikesPerPost[0]['averageLikes'] * 100) / 100,
+      averagePostRating:
+        Math.round(+averagePostRating[0]['averageRating'] * 100) / 100,
+    },
+  });
 });

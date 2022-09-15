@@ -53,18 +53,18 @@ module.exports = (sequelize, DataTypes) => {
   post.associate = (models) => {
     post.belongsTo(models.user);
   };
-  post.associate = (models) => {
-    post.hasMany(models.like, {
-      onDelete: 'CASCADE',
-      hooks: true,
-    });
-  };
-  post.associate = (models) => {
-    post.hasMany(models.comment, {
-      onDelete: 'CASCADE',
-      hooks: true,
-    });
-  };
+  // post.associate = (models) => {
+  //   post.hasMany(models.like, {
+  //     onDelete: 'CASCADE',
+  //     hooks: true,
+  //   });
+  // };
+  // post.associate = (models) => {
+  //   post.hasMany(models.comment, {
+  //     onDelete: 'CASCADE',
+  //     hooks: true,
+  //   });
+  // };
 
   return post;
 };
