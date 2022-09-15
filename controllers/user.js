@@ -1,18 +1,20 @@
 require('dotenv').config();
-const { user: User } = require('../models/index');
 const { Op, Sequelize } = require('sequelize');
+const { user: User } = require('../models/index');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const user = require('../models/user');
 
 exports.createUser = catchAsync(async (req, res, next) => {
-  const { username, email, password, role } = req.body;
-  const hashedPassword = await bcrypt.hash(password, 8);
+  const { username, age, email, password, role } = req.body;
+  // const hashedPassword = await bcrypt.hash(password, 8);
   const user = await User.create({
     username,
+    age,
     email,
-    password: hashedPassword,
+    password,
     role,
   });
   res.status(201).json({
@@ -45,19 +47,34 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
 });
 
 exports.getUsers = catchAsync(async (req, res, next) => {
-  let users;
-  if (req.user.role === 'admin') {
-    users = await User.findAll({
-      where: { role: 'user' },
-      attributes: { exclude: ['password', 'deletedAt'] },
-    });
-  } else {
-    users = await User.findAll({
-      where: { role: { [Op.ne]: 'superAdmin' } },
+  const { username, role, email, age } = req.query;
+  let ageKey;
+  let ageValue;
+
+  let where = {
+    where: { role: { [Op.ne]: 'superAdmin' } },
+    attributes: { exclude: ['password', 'deletedAt'] },
+    order: [['role', 'DESC']],
+  };
+  age &&
+    ((ageKey = Object.keys(age)[0]),
+    (ageValue = Number(Object.values(age)[0])),
+    (where = {
+      where: {
+        role: { [Op.ne]: 'superAdmin' },
+        age: { [Op[ageKey]]: ageValue },
+      },
       attributes: { exclude: ['password', 'deletedAt'] },
       order: [['role', 'DESC']],
-    });
-  }
+    }));
+  username && (where.where.username = username);
+  role && (where.where.role = role);
+  email && (where.where.email = email);
+
+  console.log(where);
+
+  const users = await User.findAll(where);
+
   res.status(200).json({
     message: 'success',
     data: {

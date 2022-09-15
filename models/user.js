@@ -1,16 +1,26 @@
+const bcrypt = require('bcrypt');
+
 module.exports = (sequelize, DataTypes) => {
   const user = sequelize.define(
     'user',
     {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: DataTypes.INTEGER,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
       },
       username: {
         type: DataTypes.STRING,
         allowNull: false,
+      },
+      age: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        validate: {
+          min: 12,
+          max: 90,
+        },
       },
       email: {
         type: DataTypes.STRING,
@@ -50,8 +60,22 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
+  user.beforeCreate(async (user, options) => {
+    const hashedPassword = await bcrypt.hash(user.password, 10);
+    user.password = hashedPassword;
+  });
+
   user.associate = (models) => {
-    user.hasOne(models.post);
+    user.hasMany(models.post, {
+      onDelete: 'CASCADE',
+      hooks: true,
+    });
+  };
+  user.associate = (models) => {
+    user.hasMany(models.like, {
+      onDelete: 'CASCADE',
+      hooks: true,
+    });
   };
 
   return user;

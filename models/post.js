@@ -2,9 +2,9 @@ module.exports = (sequelize, DataTypes) => {
   const post = sequelize.define('post', {
     id: {
       allowNull: false,
-      autoIncrement: true,
       primaryKey: true,
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
     },
     image: {
       type: DataTypes.STRING,
@@ -15,16 +15,30 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     userId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: {
         model: 'users',
         key: 'id',
       },
+      onDelete: 'CASCADE',
+      hooks: true,
     },
     status: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    likes: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    rating: {
+      type: DataTypes.FLOAT,
+      validate: {
+        min: 1,
+        max: 5,
+      },
     },
     createdAt: {
       allowNull: false,
@@ -38,6 +52,18 @@ module.exports = (sequelize, DataTypes) => {
 
   post.associate = (models) => {
     post.belongsTo(models.user);
+  };
+  post.associate = (models) => {
+    post.hasMany(models.like, {
+      onDelete: 'CASCADE',
+      hooks: true,
+    });
+  };
+  post.associate = (models) => {
+    post.hasMany(models.comment, {
+      onDelete: 'CASCADE',
+      hooks: true,
+    });
   };
 
   return post;
