@@ -4,12 +4,24 @@ module.exports = {
     await queryInterface.createTable('Comments', {
       id: {
         allowNull: false,
-        primaryKey: true,
+        unique: true,
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
       },
+      text: {
+        type: Sequelize.ENUM(
+          'veryBad',
+          'Bad',
+          'normal',
+          'good',
+          'veryGood',
+          'excellent'
+        ),
+        allowNull: false,
+      },
       userId: {
         type: Sequelize.UUID,
+        primaryKey: true,
         allowNull: false,
         references: {
           model: 'users',
@@ -20,6 +32,7 @@ module.exports = {
       },
       postId: {
         type: Sequelize.UUID,
+        primaryKey: true,
         allowNull: false,
         references: {
           model: 'posts',

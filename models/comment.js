@@ -2,12 +2,24 @@ module.exports = (sequelize, DataTypes) => {
   const comment = sequelize.define('comment', {
     id: {
       allowNull: false,
-      primaryKey: true,
+      unique: true,
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
     },
+    text: {
+      type: DataTypes.ENUM(
+        'veryBad',
+        'Bad',
+        'normal',
+        'good',
+        'veryGood',
+        'excellent'
+      ),
+      allowNull: false,
+    },
     userId: {
       type: DataTypes.UUID,
+      primaryKey: true,
       allowNull: false,
       references: {
         model: 'users',
@@ -18,6 +30,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     postId: {
       type: DataTypes.UUID,
+      primaryKey: true,
       allowNull: false,
       references: {
         model: 'posts',

@@ -174,7 +174,6 @@ exports.logout = catchAsync(async (req, res, next) => {
 
 exports.getUserStats = catchAsync(async (req, res, next) => {
   const user = await User.findOne({ where: { id: req.params.id } });
-  const totalNumberOfLikes = 5;
   const numberOfPosts = await Post.count({ where: { userId: req.params.id } });
   const averageLikesPerPost = await Post.findAll({
     attributes: [
@@ -192,12 +191,20 @@ exports.getUserStats = catchAsync(async (req, res, next) => {
     where: { userId: req.params.id },
     raw: true,
   });
+  const totalNumberOfLikes = await Post.findAll({
+    attributes: [
+      'userId',
+      [Sequelize.fn('sum', Sequelize.col('likes')), 'totalLikes'],
+    ],
+    where: { userId: req.params.id },
+    raw: true,
+  });
   res.status(200).json({
     status: 'success',
     message: `Here are the stats of: ${user.username}`,
     stats: {
       numberOfPosts,
-      totalNumberOfLikes,
+      totalNumberOfLikes: +totalNumberOfLikes[0]['totalLikes'],
       averageLikesPerPost:
         Math.round(+averageLikesPerPost[0]['averageLikes'] * 100) / 100,
       averagePostRating:

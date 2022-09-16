@@ -38,11 +38,7 @@ module.exports = {
       rating: {
         type: Sequelize.DECIMAL,
         allowNull: false,
-        defaultValue: 1,
-        // references: {
-        //   model: 'comments',
-        //   key: 'id',
-        // },
+        defaultValue: 1.2,
       },
       createdAt: {
         allowNull: false,

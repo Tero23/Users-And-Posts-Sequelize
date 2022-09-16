@@ -59,7 +59,13 @@ exports.rejectPostById = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllApprovedPosts = catchAsync(async (req, res, next) => {
-  const posts = await Post.findAll({
+  const { text, userId, likes, rating } = req.query;
+  let likesKey;
+  let likesValue;
+  let ratingKey;
+  let ratingValue;
+
+  let where = {
     where: { status: 'Approved' },
     include: [
       {
@@ -67,10 +73,49 @@ exports.getAllApprovedPosts = catchAsync(async (req, res, next) => {
         attributes: ['username'],
       },
     ],
-  });
+  };
+  likes &&
+    ((likesKey = Object.keys(likes)[0]),
+    (likesValue = Number(Object.values(likes)[0])),
+    (where = {
+      where: {
+        likes: { [Op[likesKey]]: likesValue },
+      },
+      include: [
+        {
+          model: User,
+          attributes: ['username'],
+        },
+      ],
+      order: [['likes', 'DESC']],
+    }));
+
+  rating &&
+    ((ratingKey = Object.keys(rating)[0]),
+    (ratingValue = Number(Object.values(rating)[0])),
+    (where = {
+      where: {
+        rating: { [Op[ratingKey]]: likesValue },
+      },
+      include: [
+        {
+          model: User,
+          attributes: ['username'],
+        },
+      ],
+      order: [['rating', 'DESC']],
+    }));
+  text && (where.where.text = text);
+  userId && (where.where.userId = userId);
+
+  console.log(where);
+
+  const posts = await Post.findAll(where);
+
   res.status(200).json({
-    count: posts.length,
+    message: 'success',
     data: {
+      count: posts.length,
       posts,
     },
   });

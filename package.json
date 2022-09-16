@@ -6,10 +6,10 @@
   "scripts": {
     "start": "nodemon app.js",
     "debug": "ndb server.js",
-    "migrate:up": "npx sequelize db:migrate",
-    "migrate:down": "npx sequelize db:migrate:undo:all",
-    "bulkInsert": "npx sequelize-cli db:seed:all",
-    "bulkDelete": "npx sequelize-cli db:seed:undo:all"
+    "migrate:up": "sequelize db:migrate",
+    "migrate:down": "sequelize db:migrate:undo:all",
+    "bulkInsert": "sequelize db:seed:all",
+    "bulkDelete": "sequelize db:seed:undo:all"
   },
   "keywords": [],
   "author": "",
