@@ -7,14 +7,7 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: DataTypes.UUIDV4,
     },
     text: {
-      type: DataTypes.ENUM(
-        'veryBad',
-        'Bad',
-        'normal',
-        'good',
-        'veryGood',
-        'excellent'
-      ),
+      type: DataTypes.ENUM('bad', 'normal', 'good'),
       allowNull: false,
     },
     userId: {

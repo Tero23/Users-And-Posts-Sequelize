@@ -36,7 +36,7 @@ module.exports = {
         defaultValue: 0,
       },
       rating: {
-        type: Sequelize.DECIMAL,
+        type: Sequelize.FLOAT(5, 4),
         allowNull: false,
         defaultValue: 1.2,
       },

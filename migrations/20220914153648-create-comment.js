@@ -9,14 +9,7 @@ module.exports = {
         defaultValue: Sequelize.UUIDV4,
       },
       text: {
-        type: Sequelize.ENUM(
-          'veryBad',
-          'Bad',
-          'normal',
-          'good',
-          'veryGood',
-          'excellent'
-        ),
+        type: Sequelize.ENUM('bad', 'normal', 'good'),
         allowNull: false,
       },
       userId: {

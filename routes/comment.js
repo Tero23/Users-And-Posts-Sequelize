@@ -8,10 +8,10 @@ const router = express.Router();
 router.use(auth.auth);
 
 router
-  .route('/:postId')
+  .route('/:postId/comments')
   .post(commentController.commentOnPost)
   .get(commentController.getAllCommentsOfPost);
 
-router.route('/:postId/:commentId').delete(commentController.deleteComment);
+router.route('/:postId/comments').delete(commentController.deleteComment);
 
 module.exports = router;

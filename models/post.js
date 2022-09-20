@@ -34,7 +34,7 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: 0,
     },
     rating: {
-      type: DataTypes.DECIMAL,
+      type: DataTypes.FLOAT(5, 4),
       defaultValue: 1.2,
       validate: {
         min: 0,
