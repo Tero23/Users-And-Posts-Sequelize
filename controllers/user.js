@@ -1,22 +1,29 @@
 require('dotenv').config();
-const { Op, Sequelize } = require('sequelize');
+const { Op, Sequelize, UUIDV4 } = require('sequelize');
 const { user: User, post: Post } = require('../models/index');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const {
+  sendWelcomeEmail,
+  sendVerificationCode,
+} = require('../utils/emails/accounts');
+const { v4 } = require('uuid');
 const user = require('../models/user');
 
 exports.createUser = catchAsync(async (req, res, next) => {
   const { username, age, email, password, role } = req.body;
   // const hashedPassword = await bcrypt.hash(password, 8);
   const user = await User.create({
+    id: v4(),
     username,
     age,
     email,
     password,
     role,
   });
+  sendWelcomeEmail(user.email, user.username);
   res.status(201).json({
     status: 'success',
     data: {
@@ -145,6 +152,21 @@ exports.login = catchAsync(async (req, res, next) => {
   if (!user) return next(new AppError('Invalid email/password', 400));
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) return next(new AppError('Invalid email/password', 400));
+  sendVerificationCode(email);
+  res.status(200).json({
+    status: 'success',
+    message: `We have sent you a verification code to: ${email}, you have 3 minutes to insert that code and login. It's for your own security.`,
+  });
+});
+
+exports.verifyLogin = catchAsync(async (req, res, next) => {
+  const { email, code } = req.body;
+  const user = await User.findOne({ where: { email } });
+  const time = (Date.now() - user.codeCreatedAt) / 1000 / 60;
+  if (time > 3) return next(new AppError('Verification Code expired!', 400));
+  console.log(code, user.verificationCode);
+  if (code !== user.verificationCode)
+    return next(new AppError('Invalid verification code!', 400));
   const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
@@ -162,6 +184,9 @@ exports.login = catchAsync(async (req, res, next) => {
 });
 
 exports.logout = catchAsync(async (req, res, next) => {
+  req.user.verificationCode = null;
+  req.user.codeCreatedAt = null;
+  await req.user.save();
   res
     .status(200)
     .clearCookie('token')

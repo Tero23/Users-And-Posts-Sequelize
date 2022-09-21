@@ -17,6 +17,17 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
+        id: '82b4bbcc-f294-4ee4-98df-c2b0a849b04b',
+        username: 'Varant D.',
+        age: 27,
+        email: 'varantdoumanian@gmail.com',
+        role: 'user',
+        password:
+          '$2b$08$SKv4OmZ.AfClxQDlGfzu2.xnwFN41qR1vRV.VH3I9DmcbSJ45w41i',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
         id: 'cf87d9b7-51b5-40fb-b6ef-b20db6c7b548',
         username: 'Serly',
         age: 24,

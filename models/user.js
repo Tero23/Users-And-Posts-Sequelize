@@ -46,6 +46,12 @@ module.exports = (sequelize, DataTypes) => {
           isIn: [['user', 'admin', 'superAdmin']],
         },
       },
+      verificationCode: {
+        type: DataTypes.INTEGER,
+      },
+      codeCreatedAt: {
+        type: DataTypes.BIGINT,
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE,

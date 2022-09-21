@@ -29,6 +29,12 @@ module.exports = {
         type: Sequelize.ENUM('user', 'admin', 'superAdmin'),
         allowNull: false,
       },
+      verificationCode: {
+        type: Sequelize.INTEGER,
+      },
+      codeCreatedAt: {
+        type: Sequelize.BIGINT,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
