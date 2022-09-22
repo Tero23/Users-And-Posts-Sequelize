@@ -18,6 +18,7 @@ router
   .post(
     auth.auth,
     auth.restrictTo('user', 'admin', 'superAdmin'),
+    postController.resizeUserPhoto,
     multer(postController.multerConfig).single('image'),
     postController.createPost
   );

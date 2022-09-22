@@ -3,6 +3,7 @@ const { Op, Sequelize } = require('sequelize');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const multer = require('multer');
+const sharp = require('sharp');
 
 exports.multerConfig = {
   storage: multer.diskStorage({
@@ -184,4 +185,14 @@ exports.getPostById = catchAsync(async (req, res, next) => {
   });
   if (!post) return next(new AppError('There is no post with that ID!', 404));
   res.status(200).json({ post });
+});
+
+exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
+  if (!req.file) return next();
+  await sharp(req.file.buffer)
+    .resize(500, 500)
+    .toFormat('jpeg')
+    .jpeg({ quality: 90 })
+    .toFile(`images/${req.file.filename}`);
+  next();
 });
