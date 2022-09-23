@@ -146,27 +146,49 @@ exports.updateUser = catchAsync(async (req, res, next) => {
   });
 });
 
+// exports.login = catchAsync(async (req, res, next) => {
+//   const { email, password } = req.body;
+//   const user = await User.findOne({ where: { email } });
+//   if (!user) return next(new AppError('Invalid email/password', 400));
+//   const isMatch = await bcrypt.compare(password, user.password);
+//   if (!isMatch) return next(new AppError('Invalid email/password', 400));
+//   sendVerificationCode(email);
+//   res.status(200).json({
+//     status: 'success',
+//     message: `We have sent you a verification code to: ${email}, you have 3 minutes to insert that code and login. It's for your own security.`,
+//   });
+// });
+
+// exports.verifyLogin = catchAsync(async (req, res, next) => {
+//   const { email, code } = req.body;
+//   const user = await User.findOne({ where: { email } });
+//   const time = (Date.now() - user.codeCreatedAt) / 1000 / 60;
+//   if (time > 3) return next(new AppError('Verification Code expired!', 400));
+//   console.log(code, user.verificationCode);
+//   if (code !== user.verificationCode)
+//     return next(new AppError('Invalid verification code!', 400));
+//   const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY, {
+//     expiresIn: process.env.JWT_EXPIRES_IN,
+//   });
+//   res
+//     .cookie('token', token, { maxAge: 5 * 60 * 60 * 1000, httpOnly: true })
+//     .cookie('user_id', user.id, { maxAge: 5 * 60 * 60 * 1000 })
+//     .status(200)
+//     .json({
+//       status: 'success',
+//       message: 'Logged In successfully!',
+//       data: {
+//         user,
+//       },
+//     });
+// });
+
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
   const user = await User.findOne({ where: { email } });
   if (!user) return next(new AppError('Invalid email/password', 400));
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) return next(new AppError('Invalid email/password', 400));
-  sendVerificationCode(email);
-  res.status(200).json({
-    status: 'success',
-    message: `We have sent you a verification code to: ${email}, you have 3 minutes to insert that code and login. It's for your own security.`,
-  });
-});
-
-exports.verifyLogin = catchAsync(async (req, res, next) => {
-  const { email, code } = req.body;
-  const user = await User.findOne({ where: { email } });
-  const time = (Date.now() - user.codeCreatedAt) / 1000 / 60;
-  if (time > 3) return next(new AppError('Verification Code expired!', 400));
-  console.log(code, user.verificationCode);
-  if (code !== user.verificationCode)
-    return next(new AppError('Invalid verification code!', 400));
   const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });

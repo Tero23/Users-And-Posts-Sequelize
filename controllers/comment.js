@@ -4,11 +4,12 @@ const {
   like: Like,
   comment: Comment,
 } = require('../models/index');
-const { Op, Sequelize } = require('sequelize');
+const sequelize = require('sequelize');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
 exports.commentOnPost = catchAsync(async (req, res, next) => {
+  const result = await sequelize.transaction();
   const comment = await Comment.create({
     text: req.body.text,
     userId: req.user.id,
@@ -19,8 +20,6 @@ exports.commentOnPost = catchAsync(async (req, res, next) => {
 
   if (comment.text === 'bad') rating -= 0.1;
   if (comment.text === 'good') rating += 0.1;
-  console.log(rating);
-
   await post.update({ rating });
   res.status(201).json({
     status: 'success',
@@ -55,7 +54,10 @@ exports.deleteComment = catchAsync(async (req, res, next) => {
   console.log(rating);
   const comment = await Comment.findOne({
     where: {
-      [Op.and]: [{ postId: req.params.postId }, { userId: req.user.id }],
+      [sequelize.Op.and]: [
+        { postId: req.params.postId },
+        { userId: req.user.id },
+      ],
     },
   });
   if (!comment) return next(new AppError('There is no such comment!', 400));

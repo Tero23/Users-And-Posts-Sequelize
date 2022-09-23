@@ -6,7 +6,7 @@ const express = require('express');
 const router = express.Router();
 
 router.route('/login').post(userController.login);
-router.route('/login/verify').post(userController.verifyLogin);
+// router.route('/login/verify').post(userController.verifyLogin);
 
 router.use(auth.auth);
 
