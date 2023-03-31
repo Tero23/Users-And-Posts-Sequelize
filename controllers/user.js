@@ -10,7 +10,6 @@ const {
   sendVerificationCode,
 } = require('../utils/emails/accounts');
 const { v4 } = require('uuid');
-const user = require('../models/user');
 
 exports.createUser = catchAsync(async (req, res, next) => {
   const { username, age, email, password, role } = req.body;

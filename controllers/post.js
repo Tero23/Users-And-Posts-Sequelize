@@ -4,20 +4,27 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const multer = require('multer');
 const sharp = require('sharp');
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+
+const s3 = new S3Client({
+  credentials: {
+    accessKeyId: process.env.BUCKET_ACCESS_KEY,
+    secretAccessKey: process.env.BUCKET_SECRET_ACCESS_KEY,
+  },
+  region: process.env.BUCKET_REGION,
+});
 
 exports.multerConfig = {
-  storage: multer.diskStorage({
-    //Setup where the user's file will go
-    destination: function (req, file, next) {
-      next(null, 'images');
-    },
+  storage: multer.memoryStorage(),
+  //Setup where the user's file will go
+  // destination: function (req, file, next) {
+  //   next(null, 'images');
+  // },
 
-    //Then give the file a unique name
-    filename: function (req, file, next) {
-      next(null, Date.now() + '.' + file.originalname);
-    },
-  }),
-
+  //Then give the file a unique name
+  // filename: function (req, file, next) {
+  //   next(null, Date.now() + '.' + file.originalname);
+  // },
   //A means of ensuring only images are uploaded.
   fileFilter: function (req, file, next) {
     if (!file) {
@@ -138,11 +145,23 @@ exports.approvePost = catchAsync(async (req, res, next) => {
 
 exports.createPost = catchAsync(async (req, res, next) => {
   const post = await Post.create({
-    image: req.file.filename,
+    image: Date.now() + '.' + req.file.originalname,
     text: req.body.text,
     userId: req.user.id,
     status: 'Pending',
   });
+
+  const params = {
+    Bucket: process.env.BUCKET_NAME,
+    Key: req.file.originalname,
+    Body: req.file.buffer,
+    ContentType: req.file.mimetype,
+  };
+
+  const command = new PutObjectCommand(params);
+
+  await s3.send(command);
+
   res.status(201).json({
     status: 'success',
     message: 'Post created, wait for approval!',
